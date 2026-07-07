@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { Suspense, lazy, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { detectRoleFromEmail, ROLE_META } from '../../utils/roleDetection';
-import Login3DBackground from '../../components/auth/Login3DBackground';
-import logo from '../../assets/logo.png';
+import logo from '../../assets/logo-ui.png';
+
+const Login3DBackground = lazy(() => import('../../components/auth/Login3DBackground'));
 
 const validatePassword = (pw) => {
   return {
@@ -15,7 +16,7 @@ const validatePassword = (pw) => {
   };
 };
 
-const PasswordChecklist = ({ password }) => {
+const PasswordChecklist = ({ password, isDarkMode }) => {
   const checks = validatePassword(password);
 
   const items = [
@@ -27,16 +28,24 @@ const PasswordChecklist = ({ password }) => {
   ];
 
   return (
-    <div className="mt-2.5 p-3 rounded-xl bg-black/40 border border-white/10 space-y-1.5 text-xs text-left">
-      <p className="font-bold text-[10px] uppercase tracking-wider text-slate-400 mb-1">Password Requirements</p>
+    <div className={`mt-2.5 space-y-1.5 rounded-xl border p-3 text-left text-xs ${
+      isDarkMode ? 'border-white/10 bg-black/40' : 'border-slate-200 bg-slate-50'
+    }`}>
+      <p className={`mb-1 text-[10px] font-bold uppercase tracking-wider ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+        Password Requirements
+      </p>
       {items.map((item, idx) => (
         <div key={idx} className="flex items-center gap-2">
-          <span className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[10px] ${
-            item.met ? 'bg-green-500/20 text-green-400' : 'bg-slate-800 text-slate-500'
+          <span className={`flex h-3.5 w-3.5 items-center justify-center rounded-full text-[10px] ${
+            item.met
+              ? 'bg-green-500/20 text-green-500'
+              : isDarkMode
+                ? 'bg-slate-800 text-slate-500'
+                : 'bg-slate-200 text-slate-500'
           }`}>
             {item.met ? '✓' : '•'}
           </span>
-          <span className={item.met ? 'text-green-400 font-semibold' : 'text-slate-400'}>
+          <span className={item.met ? 'font-semibold text-green-500' : isDarkMode ? 'text-slate-400' : 'text-slate-600'}>
             {item.label}
           </span>
         </div>
@@ -48,7 +57,8 @@ const PasswordChecklist = ({ password }) => {
 export default function AuthPage({ initialMode }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { login, register } = useApp();
+  const { login, register, settings } = useApp();
+  const isDarkMode = settings?.darkMode ?? true;
 
   // Derive mode from URL
   const urlMode = location.pathname.includes('register') || location.pathname.includes('signup') ? 'register' : 'login';
@@ -57,14 +67,6 @@ export default function AuthPage({ initialMode }) {
   // Registration step state
   const [registerStep, setRegisterStep] = useState(1);
   const [detectedRoleForRegister, setDetectedRoleForRegister] = useState(null);
-
-  useEffect(() => {
-    if (mode !== 'forgot') {
-      setMode(urlMode);
-      setRegisterStep(1);
-      setDetectedRoleForRegister(null);
-    }
-  }, [urlMode, mode]);
 
   // Shared fields
   const [email, setEmail] = useState('');
@@ -239,7 +241,7 @@ export default function AuthPage({ initialMode }) {
         setMode('login');
         setError('');
       }, 3000);
-    } catch (err) {
+    } catch {
       setError('Password reset failed.');
     } finally {
       setLoading(false);
@@ -260,7 +262,9 @@ export default function AuthPage({ initialMode }) {
       type="button"
       aria-label={isVisible ? 'Hide password' : 'Show password'}
       onClick={toggleFunc}
-      className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-white transition-colors rounded-lg"
+      className={`absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1 transition-colors ${
+        isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-400 hover:text-slate-900'
+      }`}
     >
       {isVisible ? (
         <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
@@ -289,21 +293,75 @@ export default function AuthPage({ initialMode }) {
     );
   };
 
-  const inputClass = "w-full px-4 py-3 rounded-xl bg-black/35 border border-white/12 text-white placeholder:text-slate-500 text-[14px] focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200";
-  const labelClass = "block text-[13px] font-medium text-slate-300 mb-1.5";
-  const btnPrimaryClass = "w-full py-3.5 rounded-xl font-medium text-white text-[14px] bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 shadow-[0_8px_25px_rgba(37,99,235,0.35)] hover:shadow-[0_10px_30px_rgba(37,99,235,0.5)] hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all duration-200";
+  const inputClass = isDarkMode
+    ? 'w-full rounded-xl border border-white/12 bg-black/35 px-4 py-3 text-[14px] text-white placeholder:text-slate-500 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20'
+    : 'w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-[14px] text-slate-950 placeholder:text-slate-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/15';
+  const labelClass = `mb-1.5 block text-[13px] font-medium ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`;
+  const btnPrimaryClass = 'w-full rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 py-3.5 text-[14px] font-medium text-white shadow-[0_8px_25px_rgba(37,99,235,0.35)] transition-all duration-200 hover:scale-[1.01] hover:shadow-[0_10px_30px_rgba(37,99,235,0.5)] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100';
+  const pageClass = isDarkMode
+    ? 'min-h-screen bg-[#0B1220] text-white flex flex-col lg:flex-row relative overflow-hidden font-sans selection:bg-blue-500 selection:text-white text-left'
+    : 'min-h-screen bg-white text-slate-950 flex flex-col lg:flex-row relative overflow-hidden font-sans selection:bg-blue-100 selection:text-slate-950 text-left';
+  const authCardClass = isDarkMode
+    ? 'relative z-10 w-full max-w-[440px] rounded-[28px] border border-white/12 bg-[#0A101D]/75 p-6 shadow-[0_32px_80px_rgba(0,0,0,0.65),0_0_40px_rgba(37,99,235,0.12)] backdrop-blur-2xl transition-all duration-300 sm:bg-white/[0.045] sm:p-9'
+    : 'relative z-10 w-full max-w-[440px] rounded-[28px] border border-slate-200 bg-white p-6 shadow-[0_24px_60px_rgba(15,23,42,0.10)] transition-all duration-300 sm:p-9';
+  const tabBarClass = isDarkMode
+    ? 'relative mb-7 flex rounded-2xl border border-white/10 bg-black/45 p-1.5 backdrop-blur-md'
+    : 'relative mb-7 flex rounded-2xl border border-slate-200 bg-slate-100 p-1.5';
+  const tabIndicatorClass = isDarkMode
+    ? 'absolute top-1.5 bottom-1.5 w-[calc(50%-6px)] rounded-xl border border-blue-400/30 bg-gradient-to-r from-blue-600/90 to-indigo-600/90 shadow-[0_2px_12px_rgba(37,99,235,0.35)] transition-all duration-300 ease-out'
+    : 'absolute top-1.5 bottom-1.5 w-[calc(50%-6px)] rounded-xl border border-slate-200 bg-white shadow-[0_10px_22px_rgba(15,23,42,0.08)] transition-all duration-300 ease-out';
+  const headingClass = `font-display text-[24px] font-semibold tracking-tight sm:text-[26px] ${isDarkMode ? 'text-white' : 'text-slate-950'}`;
+  const subheadingClass = `${isDarkMode ? 'text-slate-400' : 'text-slate-600'} mt-1 text-[13px] leading-relaxed sm:text-[14px]`;
+  const brandTitleClass = `text-[20px] font-display font-semibold leading-tight tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-950'}`;
+  const brandSubtitleClass = `${isDarkMode ? 'text-slate-400' : 'text-slate-600'} text-[12px] font-normal`;
+  const heroTitleClass = `font-display text-[36px] font-bold leading-[1.08] tracking-tight sm:text-[46px] xl:text-[52px] ${isDarkMode ? 'text-white' : 'text-slate-950'}`;
+  const heroBodyClass = `${isDarkMode ? 'text-slate-300/90' : 'text-slate-600'} mt-5 max-w-[460px] text-[15px] leading-relaxed sm:text-[16px]`;
+  const statValueClass = `text-[20px] font-display font-semibold tracking-tight sm:text-[22px] ${isDarkMode ? 'text-white' : 'text-slate-950'}`;
+  const statLabelClass = `${isDarkMode ? 'text-slate-400' : 'text-slate-600'} mt-0.5 text-[12px]`;
+  const bottomMetaClass = `relative z-10 hidden items-center gap-6 text-[12px] font-medium sm:flex ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`;
+  const inlineLinkClass = `bg-transparent border-none cursor-pointer text-[12px] font-medium transition-colors ${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'}`;
+  const backButtonClass = `rounded-xl border px-5 py-3.5 text-[14px] font-medium transition-all duration-200 ${isDarkMode ? 'border-white/12 text-slate-300 hover:bg-white/5' : 'border-slate-300 text-slate-700 hover:bg-slate-50'}`;
+  const checkboxClass = isDarkMode
+    ? 'mt-1 rounded border-white/12 bg-black/35 text-blue-600 focus:ring-blue-500'
+    : 'mt-1 rounded border-slate-300 bg-white text-blue-600 focus:ring-blue-500';
+  const socialButtonClass = isDarkMode
+    ? 'w-full flex items-center justify-center gap-2.5 rounded-xl border border-white/12 bg-white/[0.04] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/[0.08] focus:outline-none'
+    : 'w-full flex items-center justify-center gap-2.5 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-900 transition-colors hover:bg-slate-50 focus:outline-none';
+  const dividerLineClass = isDarkMode ? 'bg-white/10' : 'bg-slate-200';
+  const dividerLabelClass = `${isDarkMode ? 'bg-[#0A101D] text-slate-500' : 'bg-white text-slate-500'} relative px-3 text-[10px] font-bold uppercase tracking-wider`;
+  const footerNoteClass = `${isDarkMode ? 'text-slate-500' : 'text-slate-600'} mt-6 text-center text-[12px]`;
 
   return (
-    <div className="min-h-screen bg-[#0B1220] text-white flex flex-col lg:flex-row relative overflow-hidden font-sans selection:bg-blue-500 selection:text-white text-left">
-      {/* 3D Animation Background spanning across BOTH Left Hero and Right Login/Register section */}
-      <div className="absolute inset-0 w-full h-full pointer-events-none z-0">
-        <Login3DBackground />
+    <div className={pageClass}>
+      <div className="absolute inset-0 h-full w-full pointer-events-none z-0">
+        {isDarkMode ? (
+          <Suspense
+            fallback={
+              <div
+                className="absolute inset-0"
+                style={{
+                  background:
+                    'radial-gradient(1000px 700px at 30% 50%, rgba(37,99,235,0.16), transparent 65%), radial-gradient(800px 600px at 80% 50%, rgba(124,58,237,0.12), transparent 60%), radial-gradient(600px 400px at 50% 90%, rgba(34,197,94,0.08), transparent 55%)',
+                }}
+              />
+            }
+          >
+            <Login3DBackground />
+          </Suspense>
+        ) : (
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'radial-gradient(900px 620px at 20% 28%, rgba(37,99,235,0.10), transparent 58%), radial-gradient(700px 520px at 78% 26%, rgba(56,189,248,0.10), transparent 52%), linear-gradient(180deg, rgba(255,255,255,1), rgba(248,250,252,1))',
+            }}
+          />
+        )}
       </div>
 
-      {/* Cosmic Ambient Background Glows across the whole page */}
-      <div className="absolute -top-32 -left-32 w-[600px] h-[600px] bg-blue-600/15 rounded-full blur-[140px] pointer-events-none z-0" />
-      <div className="absolute top-1/2 left-1/3 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[150px] pointer-events-none z-0" />
-      <div className="absolute -bottom-32 -right-32 w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-[140px] pointer-events-none z-0" />
+      <div className={`absolute -top-32 -left-32 h-[600px] w-[600px] rounded-full blur-[140px] pointer-events-none z-0 ${isDarkMode ? 'bg-blue-600/15' : 'bg-blue-500/8'}`} />
+      <div className={`absolute top-1/2 left-1/3 h-[500px] w-[500px] rounded-full blur-[150px] pointer-events-none z-0 ${isDarkMode ? 'bg-indigo-500/10' : 'bg-sky-400/8'}`} />
+      <div className={`absolute -bottom-32 -right-32 h-[600px] w-[600px] rounded-full blur-[140px] pointer-events-none z-0 ${isDarkMode ? 'bg-blue-500/10' : 'bg-cyan-400/8'}`} />
 
       {/* Left Hero Section */}
       <div className="relative w-full lg:w-[54%] xl:w-[56%] min-h-[380px] lg:min-h-screen flex flex-col justify-between p-6 sm:p-10 lg:p-14 xl:p-16 z-10 order-1">
@@ -323,42 +381,42 @@ export default function AuthPage({ initialMode }) {
               className="w-11 h-11 object-contain drop-shadow-[0_4px_18px_rgba(37,99,235,0.45)]"
             />
             <div>
-              <div className="text-[20px] font-display font-semibold tracking-tight text-white leading-tight">BioPay</div>
-              <div className="text-slate-400 text-[12px] font-normal">Student Network</div>
+              <div className={brandTitleClass}>BioPay</div>
+              <div className={brandSubtitleClass}>Student Network</div>
             </div>
           </div>
         </header>
 
         {/* Hero Content */}
         <main className="relative z-10 my-auto py-10 lg:py-16 max-w-[540px]">
-          <h1 className="font-display text-[36px] sm:text-[46px] xl:text-[52px] leading-[1.08] font-bold tracking-tight text-white">
+          <h1 className={heroTitleClass}>
             One campus identity.<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-sky-300 to-emerald-400">
               Every opportunity.
             </span>
           </h1>
-          <p className="text-slate-300/90 text-[15px] sm:text-[16px] leading-relaxed mt-5 max-w-[460px]">
+          <p className={heroBodyClass}>
             Build your verified academic identity, showcase real achievements, and unlock internships, opportunities, and recognition — all in one place.
           </p>
 
-          <div className="mt-8 pt-8 border-t border-white/10 grid grid-cols-3 gap-4 sm:gap-6 max-w-[460px]">
+          <div className={`mt-8 max-w-[460px] grid grid-cols-3 gap-4 border-t pt-8 sm:gap-6 ${isDarkMode ? 'border-white/10' : 'border-slate-200'}`}>
             <div>
-              <div className="text-[20px] sm:text-[22px] font-display font-semibold text-white tracking-tight">Verified Identity</div>
-              <div className="text-[12px] text-slate-400 mt-0.5">College-confirmed profile</div>
+              <div className={statValueClass}>Verified Identity</div>
+              <div className={statLabelClass}>College-confirmed profile</div>
             </div>
             <div>
-              <div className="text-[20px] sm:text-[22px] font-display font-semibold text-white tracking-tight">Merit Scoring</div>
-              <div className="text-[12px] text-slate-400 mt-0.5">Earn as you contribute</div>
+              <div className={statValueClass}>Merit Scoring</div>
+              <div className={statLabelClass}>Earn as you contribute</div>
             </div>
             <div>
-              <div className="text-[20px] sm:text-[22px] font-display font-semibold text-white tracking-tight">Opportunity Match</div>
-              <div className="text-[12px] text-slate-400 mt-0.5">Internships & more</div>
+              <div className={statValueClass}>Opportunity Match</div>
+              <div className={statLabelClass}>Internships & more</div>
             </div>
           </div>
         </main>
 
         {/* Bottom Meta */}
-        <footer className="relative z-10 hidden sm:flex items-center gap-6 text-[12px] text-slate-400 font-medium">
+        <footer className={bottomMetaClass}>
           <span className="flex items-center gap-1.5">✅ Verified Student Profiles</span>
           <span className="flex items-center gap-1.5">🏆 Merit-Based Recognition</span>
           <span className="flex items-center gap-1.5">🌐 BSN by ConnectBioPay</span>
@@ -367,15 +425,21 @@ export default function AuthPage({ initialMode }) {
 
       {/* Right Auth Card Section */}
       <div className="flex-1 flex items-center justify-center p-4 sm:p-8 lg:p-12 z-10 order-2 relative">
-        <div className="relative z-10 w-full max-w-[440px] bg-[#0A101D]/75 sm:bg-white/[0.045] backdrop-blur-2xl border border-white/12 rounded-[28px] shadow-[0_32px_80px_rgba(0,0,0,0.65),0_0_40px_rgba(37,99,235,0.12)] p-6 sm:p-9 transition-all duration-300">
+        <div className={authCardClass}>
           {/* Segmented Tab Bar */}
           {mode !== 'forgot' && (
-            <div className="relative flex bg-black/45 p-1.5 rounded-2xl border border-white/10 mb-7 backdrop-blur-md">
+            <div className={tabBarClass}>
               <button
                 type="button"
                 onClick={() => switchMode('login')}
-                className={`relative z-10 flex-1 py-2.5 text-center text-[13px] sm:text-[14px] font-medium transition-colors duration-200 rounded-xl ${
-                  mode === 'login' ? 'text-white' : 'text-slate-400 hover:text-slate-200'
+                className={`relative z-10 flex-1 rounded-xl py-2.5 text-center text-[13px] font-medium transition-colors duration-200 sm:text-[14px] ${
+                  mode === 'login'
+                    ? isDarkMode
+                      ? 'text-white'
+                      : 'text-slate-950'
+                    : isDarkMode
+                      ? 'text-slate-400 hover:text-slate-200'
+                      : 'text-slate-500 hover:text-slate-900'
                 }`}
               >
                 Sign In
@@ -383,24 +447,28 @@ export default function AuthPage({ initialMode }) {
               <button
                 type="button"
                 onClick={() => switchMode('register')}
-                className={`relative z-10 flex-1 py-2.5 text-center text-[13px] sm:text-[14px] font-medium transition-colors duration-200 rounded-xl ${
-                  mode === 'register' ? 'text-white' : 'text-slate-400 hover:text-slate-200'
+                className={`relative z-10 flex-1 rounded-xl py-2.5 text-center text-[13px] font-medium transition-colors duration-200 sm:text-[14px] ${
+                  mode === 'register'
+                    ? isDarkMode
+                      ? 'text-white'
+                      : 'text-slate-950'
+                    : isDarkMode
+                      ? 'text-slate-400 hover:text-slate-200'
+                      : 'text-slate-500 hover:text-slate-900'
                 }`}
               >
                 Register
               </button>
               {/* Animated indicator */}
               <div
-                className={`absolute top-1.5 bottom-1.5 w-[calc(50%-6px)] rounded-xl bg-gradient-to-r from-blue-600/90 to-indigo-600/90 border border-blue-400/30 shadow-[0_2px_12px_rgba(37,99,235,0.35)] transition-all duration-300 ease-out ${
-                  mode === 'login' ? 'left-1.5' : 'left-[calc(50%+3px)]'
-                }`}
+                className={`${tabIndicatorClass} ${mode === 'login' ? 'left-1.5' : 'left-[calc(50%+3px)]'}`}
               />
             </div>
           )}
 
           {/* Card Header — changes based on mode & step */}
           <div className="mb-6">
-            <h2 className="font-display text-[24px] sm:text-[26px] font-semibold text-white tracking-tight">
+            <h2 className={headingClass}>
               {mode === 'login'
                 ? 'Welcome back'
                 : mode === 'forgot'
@@ -409,7 +477,7 @@ export default function AuthPage({ initialMode }) {
                     ? 'Create an account'
                     : 'Complete your registration'}
             </h2>
-            <p className="text-slate-400 text-[13px] sm:text-[14px] mt-1 leading-relaxed">
+            <p className={subheadingClass}>
               {mode === 'login'
                 ? 'Enter your credentials to access your workspace'
                 : mode === 'forgot'
@@ -447,7 +515,7 @@ export default function AuthPage({ initialMode }) {
                   <button
                     type="button"
                     onClick={() => switchMode('forgot')}
-                    className="text-[12px] text-blue-400 hover:text-blue-300 transition-colors font-medium bg-transparent border-none cursor-pointer"
+                    className={inlineLinkClass}
                   >
                     Forgot password?
                   </button>
@@ -638,7 +706,7 @@ export default function AuthPage({ initialMode }) {
                 </div>
               </div>
 
-              {password && <PasswordChecklist password={password} />}
+              {password && <PasswordChecklist password={password} isDarkMode={isDarkMode} />}
 
               <div className="flex items-start gap-2 pt-1 text-left">
                 <input
@@ -646,9 +714,9 @@ export default function AuthPage({ initialMode }) {
                   type="checkbox"
                   checked={terms}
                   onChange={e => setTerms(e.target.checked)}
-                  className="mt-1 rounded border-white/12 bg-black/35 text-blue-600 focus:ring-blue-500"
+                  className={checkboxClass}
                 />
-                <label htmlFor="reg-terms" className="text-slate-400 text-xs leading-normal">
+                <label htmlFor="reg-terms" className={`text-xs leading-normal ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
                   I agree to the Terms of Service & Privacy Policy *
                 </label>
               </div>
@@ -659,7 +727,7 @@ export default function AuthPage({ initialMode }) {
                 <button
                   type="button"
                   onClick={() => { setRegisterStep(1); setError(''); }}
-                  className="py-3.5 px-5 rounded-xl font-medium text-slate-300 text-[14px] border border-white/12 hover:bg-white/5 transition-all duration-200"
+                  className={backButtonClass}
                 >
                   ← Back
                 </button>
@@ -729,7 +797,7 @@ export default function AuthPage({ initialMode }) {
                 </div>
               </div>
 
-              {password && <PasswordChecklist password={password} />}
+              {password && <PasswordChecklist password={password} isDarkMode={isDarkMode} />}
 
               {renderMessage()}
 
@@ -745,7 +813,7 @@ export default function AuthPage({ initialMode }) {
                 <button
                   type="button"
                   onClick={() => switchMode('login')}
-                  className="text-[13px] text-blue-400 hover:text-blue-300 transition-colors font-medium bg-transparent border-none cursor-pointer"
+                  className={inlineLinkClass}
                 >
                   Back to Sign In
                 </button>
@@ -757,8 +825,8 @@ export default function AuthPage({ initialMode }) {
           {mode === 'login' && (
             <>
               <div className="relative flex items-center justify-center my-5">
-                <div className="absolute inset-x-0 h-[1px] bg-white/10"></div>
-                <span className="relative px-3 text-[10px] uppercase font-bold text-slate-500 bg-[#0A101D] tracking-wider">
+                <div className={`absolute inset-x-0 h-[1px] ${dividerLineClass}`}></div>
+                <span className={dividerLabelClass}>
                   Or connect with
                 </span>
               </div>
@@ -766,7 +834,7 @@ export default function AuthPage({ initialMode }) {
               <button
                 onClick={handleGoogleSignIn}
                 type="button"
-                className="w-full flex items-center justify-center gap-2.5 rounded-xl border border-white/12 bg-white/[0.04] hover:bg-white/[0.08] px-4 py-3 text-sm font-semibold text-white transition-colors focus:outline-none"
+                className={socialButtonClass}
               >
                 <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                   <path
@@ -779,7 +847,7 @@ export default function AuthPage({ initialMode }) {
             </>
           )}
 
-          <div className="text-center text-[12px] text-slate-500 mt-6">
+          <div className={footerNoteClass}>
             © {new Date().getFullYear()} BioPay Student Network • v2.0
           </div>
         </div>

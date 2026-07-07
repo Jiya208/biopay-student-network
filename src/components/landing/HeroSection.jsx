@@ -1,181 +1,166 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { FiArrowRight } from 'react-icons/fi';
-import Button from '../common/Button';
+import { Link } from 'react-router-dom';
+import { FiArrowRight, FiCheckCircle, FiLayers, FiShield, FiUsers } from 'react-icons/fi';
+import logo from '../../assets/logo-ui.png';
+
+const HERO_METRICS = [
+  { value: '10K+', label: 'Active students' },
+  { value: '500+', label: 'Opportunities shared' },
+  { value: '150+', label: 'Campuses connected' },
+];
+
+const HERO_HIGHLIGHTS = [
+  'Verified student identity',
+  'Mentorship and hiring in one place',
+  'Fast setup with profile-first onboarding',
+];
+
+const PREVIEW_ITEMS = [
+  {
+    icon: FiShield,
+    title: 'Verified profile',
+    text: 'Build trust instantly with college-backed identity and clean academic proof.',
+  },
+  {
+    icon: FiUsers,
+    title: 'Meaningful connections',
+    text: 'Meet seniors, peers and recruiters in one focused student-first network.',
+  },
+  {
+    icon: FiLayers,
+    title: 'Everything connected',
+    text: 'Resources, opportunities, rankings and collaboration stay in one workflow.',
+  },
+];
+
+const PREVIEW_PANELS = [
+  {
+    title: 'Verified access',
+    label: 'College-backed sign-in',
+  },
+  {
+    title: 'Mentor network',
+    label: 'Guided connections',
+  },
+  {
+    title: 'Opportunity-ready',
+    label: 'Profile and portfolio flow',
+  },
+];
 
 const HeroSection = () => {
-  const navigate = useNavigate();
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.8, ease: 'easeOut' },
-    },
+  const scrollToFeatures = () => {
+    document.querySelector('#features')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   return (
-    <div className="relative w-full min-h-screen flex items-center justify-center overflow-hidden pt-20 pb-20 bg-gradient-to-br from-slate-900 via-blue-900 to-blue-800">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <motion.div
-          animate={{
-            y: [0, -20, 0],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl"
-        />
-        <motion.div
-          animate={{
-            y: [0, 20, 0],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-          className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-tr from-blue-300/20 to-blue-200/20 rounded-full blur-3xl"
-        />
-      </div>
+    <section className="landing-hero">
+      <div className="landing-hero-glow landing-hero-glow-left" aria-hidden="true" />
+      <div className="landing-hero-glow landing-hero-glow-right" aria-hidden="true" />
 
-      {/* Content */}
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
-      >
-        {/* Badge */}
-        <motion.div variants={itemVariants} className="mb-8">
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 hover:border-blue-400 transition-all"
-          >
-            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-sm font-semibold text-blue-700">Welcome to the Future of Campus Networking</span>
-          </motion.div>
-        </motion.div>
+      <div className="landing-container relative z-[1] grid gap-10 pb-12 pt-32 lg:grid-cols-[1.08fr_0.92fr] lg:items-center lg:gap-14 lg:pb-20 lg:pt-36">
+        <div className="space-y-8">
+          <span className="landing-eyebrow landing-eyebrow-dark">
+            Built for modern campuses and professional student growth
+          </span>
 
-        {/* Main Headline */}
-        <motion.h1
-          variants={itemVariants}
-          className="text-4xl sm:text-5xl lg:text-6xl font-poppins font-bold text-white mb-6 leading-tight"
-        >
-          Connect, Learn & Grow <br />
-          <motion.span
-            initial={{ backgroundPosition: '0% 50%' }}
-            animate={{ backgroundPosition: '100% 50%' }}
-            transition={{ duration: 3, repeat: Infinity, repeatType: 'reverse' }}
-            className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent"
-            style={{ backgroundSize: '200% 200%' }}
-          >
-            Together
-          </motion.span>
-        </motion.h1>
+          <div className="space-y-5">
+            <h1 className="landing-hero-title landing-hero-title-gradient">
+              Build a verified student profile that turns into real connections, mentorship and career momentum.
+            </h1>
+            <p className="landing-hero-description">
+              BioPay Student Network helps students showcase achievements, discover internships, share resources
+              and collaborate with confidence through one polished, trusted platform.
+            </p>
+          </div>
 
-        {/* Subtitle */}
-        <motion.p
-          variants={itemVariants}
-          className="text-lg sm:text-xl text-blue-100 mb-8 max-w-2xl mx-auto leading-relaxed"
-        >
-          The ultimate platform connecting students, mentors, and recruiters. Find opportunities, build relationships, and unlock your potential in one thriving network.
-        </motion.p>
-
-        {/* CTA Buttons */}
-        <motion.div
-          variants={itemVariants}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
-        >
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <Button
-              onClick={() => navigate('/login')}
-              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white flex items-center gap-2 group"
-              size="lg"
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Link to="/signup" className="landing-button landing-button-primary landing-button-lg">
+              Create free account
+              <FiArrowRight className="text-base" />
+            </Link>
+            <button
+              type="button"
+              onClick={scrollToFeatures}
+              className="landing-button landing-button-dark landing-button-lg"
             >
-              Get Started Now
-              <motion.span
-                animate={{ x: [0, 4, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-              >
-                <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
-              </motion.span>
-            </Button>
-          </motion.div>
+              Explore the platform
+            </button>
+          </div>
 
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <Button
-              onClick={() => {
-                const element = document.querySelector('#features');
-                element?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              variant="outline"
-              size="lg"
-              className="border-2 border-white/40 hover:border-white/80 hover:bg-white/10 text-white"
-            >
-              Learn More
-            </Button>
-          </motion.div>
-        </motion.div>
+          <ul className="landing-hero-points">
+            {HERO_HIGHLIGHTS.map((item) => (
+              <li key={item} className="landing-hero-point">
+                <FiCheckCircle className="mt-0.5 shrink-0 text-blue-300" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
 
-        {/* Stats */}
-        <motion.div
-          variants={itemVariants}
-          className="grid grid-cols-3 gap-4 sm:gap-8 pt-8 border-t border-blue-400/30"
-        >
-          {[
-            { number: '10K+', label: 'Active Students' },
-            { number: '500+', label: 'Opportunities' },
-            { number: '100%', label: 'Success Rate' },
-          ].map((stat, index) => (
-            <motion.div
-              key={index}
-              whileHover={{ y: -5 }}
-              className="text-center"
-            >
-              <p className="text-2xl sm:text-3xl font-poppins font-bold text-blue-300 mb-2">
-                {stat.number}
-              </p>
-              <p className="text-xs sm:text-sm text-blue-200/70">{stat.label}</p>
-            </motion.div>
-          ))}
-        </motion.div>
-      </motion.div>
-
-      {/* Scroll Indicator */}
-      <motion.div
-        animate={{ y: [0, 8, 0] }}
-        transition={{ duration: 2, repeat: Infinity }}
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-      >
-        <div className="flex flex-col items-center gap-2">
-          <p className="text-sm text-blue-200/70">Scroll to explore</p>
-          <div className="w-6 h-10 border-2 border-blue-400/50 rounded-full flex items-start justify-center p-2">
-            <motion.div
-              animate={{ y: [0, 4, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-              className="w-1 h-2 bg-blue-300 rounded-full"
-            />
+          <div className="landing-hero-metrics">
+            {HERO_METRICS.map((metric) => (
+              <div key={metric.label} className="landing-stat-card landing-stat-card-hero">
+                <div className="landing-stat-value">{metric.value}</div>
+                <p className="landing-stat-label">{metric.label}</p>
+              </div>
+            ))}
           </div>
         </div>
-      </motion.div>
-    </div>
+
+        <div className="landing-card landing-card-hero space-y-6">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <img
+                src={logo}
+                alt="BSN brand mark"
+                className="h-14 w-14 rounded-2xl object-cover shadow-[0_16px_35px_rgba(30,41,59,0.18)]"
+                width="56"
+                height="56"
+                loading="eager"
+                decoding="async"
+              />
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-700">BSN Dashboard</p>
+                <h2 className="text-2xl font-poppins font-semibold tracking-tight text-slate-950">
+                  A profile built for trust, visibility and growth.
+                </h2>
+              </div>
+            </div>
+            <span className="landing-chip landing-chip-strong">Secure access</span>
+          </div>
+
+          <div className="landing-preview-showcase">
+            <div className="landing-preview-showcase-header flex flex-wrap items-center justify-between gap-3 pb-4">
+              <div>
+                <p className="landing-preview-kicker">Verified student access</p>
+                <p className="mt-1 text-lg font-semibold text-slate-950">College-backed identity · Skills · Portfolio</p>
+              </div>
+              <span className="landing-chip landing-chip-dark">Privacy controls enabled</span>
+            </div>
+
+            <div className="grid gap-3 pt-4 sm:grid-cols-3">
+              {PREVIEW_PANELS.map((panel) => (
+                <div key={panel.title} className="landing-preview-panel">
+                  <p className="landing-preview-value landing-preview-title">{panel.title}</p>
+                  <p className="landing-preview-label">{panel.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
+            {PREVIEW_ITEMS.map(({ icon: Icon, title, text }) => (
+              <article key={title} className="landing-surface-card">
+                <div className="landing-icon-wrap">
+                  <Icon size={18} />
+                </div>
+                <h3 className="mt-4 text-base font-semibold text-slate-950">{title}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-600">{text}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
   );
 };
 

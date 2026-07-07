@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useApp } from '../../context/AppContext';
+import '../../styles/landing.css';
 import LandingNavbar from '../../components/landing/LandingNavbar';
 import HeroSection from '../../components/landing/HeroSection';
 import FeaturesSection from '../../components/landing/FeaturesSection';
@@ -9,65 +11,71 @@ import FAQSection from '../../components/landing/FAQSection';
 import FinalCTA from '../../components/landing/FinalCTA';
 import LandingFooter from '../../components/landing/LandingFooter';
 
+const SCROLL_THRESHOLD = 24;
+
 const LandingPage = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const { settings } = useApp();
+  const isDarkMode = settings?.darkMode ?? true;
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+    let frameId = 0;
+
+    const updateHeaderState = () => {
+      frameId = 0;
+      const nextScrolled = window.scrollY > SCROLL_THRESHOLD;
+      setIsScrolled((prev) => (prev === nextScrolled ? prev : nextScrolled));
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const handleScroll = () => {
+      if (frameId) return;
+      frameId = window.requestAnimationFrame(updateHeaderState);
+    };
+
+    updateHeaderState();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      if (frameId) window.cancelAnimationFrame(frameId);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   return (
-    <div className="w-full min-h-screen overflow-hidden">
-      {/* Navbar */}
+    <div className={`landing-shell ${isDarkMode ? 'is-dark' : 'is-light'}`}>
       <LandingNavbar isScrolled={isScrolled} />
 
-      {/* Main Content */}
-      <main className="w-full">
-        {/* Hero Section with gradient background */}
-        <section id="hero" className="bg-gradient-to-br from-slate-900 via-blue-900 to-blue-800">
+      <main>
+        <section id="hero" className="landing-anchor">
           <HeroSection />
         </section>
 
-        {/* Features Section */}
-        <section id="features" className="py-20 px-4 bg-white">
+        <section id="features" className="landing-anchor landing-section landing-section-muted landing-deferred">
           <FeaturesSection />
         </section>
 
-        {/* How It Works */}
-        <section id="how-it-works" className="py-20 px-4 bg-gradient-to-b from-blue-50 via-slate-50 to-white">
+        <section id="how-it-works" className="landing-anchor landing-section landing-deferred">
           <HowItWorks />
         </section>
 
-        {/* Why Choose Us */}
-        <section id="why-us" className="py-20 px-4 bg-white">
+        <section id="why-us" className="landing-anchor landing-section landing-section-muted landing-deferred">
           <WhyChooseUs />
         </section>
 
-        {/* Testimonials */}
-        <section id="testimonials" className="py-20 px-4 bg-gradient-to-b from-white via-blue-50 to-white">
+        <section id="testimonials" className="landing-anchor landing-section landing-deferred">
           <TestimonialsSection />
         </section>
 
-        {/* FAQ */}
-        <section id="faq" className="py-20 px-4 bg-white">
+        <section id="faq" className="landing-anchor landing-section landing-section-muted landing-deferred">
           <FAQSection />
         </section>
 
-        {/* Final CTA */}
-        <section id="final-cta">
+        <section id="final-cta" className="landing-anchor landing-section landing-deferred">
           <FinalCTA />
         </section>
       </main>
 
-      {/* Footer */}
-      <footer>
-        <LandingFooter />
-      </footer>
+      <LandingFooter />
     </div>
   );
 };

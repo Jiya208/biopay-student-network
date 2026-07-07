@@ -1,209 +1,105 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import {
-  FiUsers,
-  FiGlobe,
-  FiZap,
-  FiHeart,
-  FiTrendingUp,
-  FiLock,
-} from 'react-icons/fi';
+import { FiGlobe, FiHeart, FiLock, FiTrendingUp, FiUsers, FiZap } from 'react-icons/fi';
+
+const ADVANTAGES = [
+  {
+    icon: FiUsers,
+    title: 'Verified community',
+    description: 'Profiles feel more reliable because the network is built around trusted academic identity.',
+    stat: '99.8%',
+    label: 'Verified members',
+  },
+  {
+    icon: FiGlobe,
+    title: 'Broad campus reach',
+    description: 'Students can grow beyond their immediate circle while still staying inside a focused ecosystem.',
+    stat: '500+',
+    label: 'Institutions',
+  },
+  {
+    icon: FiZap,
+    title: 'Fast interaction design',
+    description: 'Fast interactions and clear layouts help students explore opportunities without unnecessary friction.',
+    stat: '<2s',
+    label: 'Perceived speed',
+  },
+  {
+    icon: FiHeart,
+    title: 'Student-first product thinking',
+    description: 'Every flow is shaped around student goals, from profile building to mentorship and placements.',
+    stat: '100%',
+    label: 'Student-centric',
+  },
+  {
+    icon: FiTrendingUp,
+    title: 'High-signal opportunity discovery',
+    description: 'Important actions, proof points and opportunity details stay easy to spot across the experience.',
+    stat: '3x',
+    label: 'Sharper discovery',
+  },
+  {
+    icon: FiLock,
+    title: 'Private by design',
+    description: 'Strong privacy controls, verification and moderation keep the network credible and secure.',
+    stat: '24/7',
+    label: 'Trust mindset',
+  },
+];
+
+const TRUST_POINTS = [
+  { value: '50K+', label: 'Active users' },
+  { value: '2K+', label: 'Monthly placements' },
+  { value: '4.9★', label: 'Platform rating' },
+  { value: '24/7', label: 'Support experience' },
+];
 
 const WhyChooseUs = () => {
-  const [hoveredIndex, setHoveredIndex] = useState(null);
-
-  const advantages = [
-    {
-      icon: FiUsers,
-      title: 'Verified Community',
-      description: 'Every member is verified through their college, ensuring authenticity and safety.',
-      stat: '99.8%',
-      statLabel: 'Verified Members',
-    },
-    {
-      icon: FiGlobe,
-      title: 'Global Reach',
-      description: 'Connect with students and professionals from top colleges across the nation.',
-      stat: '500+',
-      statLabel: 'Colleges',
-    },
-    {
-      icon: FiZap,
-      title: 'Lightning Fast',
-      description: 'Optimized platform for instant connections and real-time updates.',
-      stat: '99.9%',
-      statLabel: 'Uptime',
-    },
-    {
-      icon: FiHeart,
-      title: 'Student First',
-      description: 'Built by students, for students. We understand your unique challenges.',
-      stat: '100%',
-      statLabel: 'Free',
-    },
-    {
-      icon: FiTrendingUp,
-      title: 'Smart Matching',
-      description: 'AI-powered algorithms match you with the perfect opportunities and mentors.',
-      stat: '95%',
-      statLabel: 'Match Accuracy',
-    },
-    {
-      icon: FiLock,
-      title: 'Secure & Private',
-      description: 'Your data is protected with enterprise-grade security and privacy controls.',
-      stat: 'GDPR',
-      statLabel: 'Compliant',
-    },
-  ];
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6 },
-    },
-  };
-
   return (
-    <div className="max-w-6xl mx-auto">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        viewport={{ once: true }}
-        className="text-center mb-16"
-      >
-        <h2 className="text-3xl sm:text-4xl font-poppins font-bold text-gray-900 mb-4">
-          Why Choose Biopay Student Network?
-        </h2>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          We're not just another platform. We're built for real student success.
-        </p>
-      </motion.div>
+    <div className="landing-container space-y-14">
+      <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+        <div className="space-y-5">
+          <span className="landing-eyebrow">Why students choose BSN</span>
+          <h2 className="landing-title text-left">
+            Trust, speed and clarity make every important action feel easier.
+          </h2>
+          <p className="landing-subtitle text-left">
+            From verification to discovery, BSN is structured to help students move with confidence across every stage
+            of their academic and career journey.
+          </p>
+          <div className="landing-card p-6">
+            <p className="text-sm leading-7 text-slate-600">
+              The platform balances credibility with usability so students can focus on real progress, not platform
+              complexity.
+            </p>
+          </div>
+        </div>
 
-      {/* Advantages Grid */}
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-      >
-        {advantages.map((advantage, index) => {
-          const Icon = advantage.icon;
-          const isHovered = hoveredIndex === index;
-
-          return (
-            <motion.div
-              key={index}
-              variants={itemVariants}
-              onMouseEnter={() => setHoveredIndex(index)}
-              onMouseLeave={() => setHoveredIndex(null)}
-              whileHover={{ y: -8 }}
-              className="relative group"
-            >
-              {/* Background Glow */}
-              <motion.div
-                animate={{
-                  opacity: isHovered ? 1 : 0.5,
-                  scale: isHovered ? 1 : 0.95,
-                }}
-                className="absolute -inset-0.5 bg-gradient-to-r from-blue-400 to-purple-400 rounded-2xl blur opacity-30 group-hover:opacity-50 transition-opacity"
-              />
-
-              {/* Card */}
-              <div className="relative bg-white rounded-2xl p-8 h-full border border-gray-200 hover:border-blue-300 transition-colors">
-                {/* Top Section with Icon & Stat */}
-                <div className="flex items-start justify-between mb-6">
-                  <motion.div
-                    whileHover={{ rotate: 360, scale: 1.1 }}
-                    transition={{ duration: 0.6 }}
-                    className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center group-hover:from-blue-100 group-hover:to-purple-100 transition-colors"
-                  >
-                    <Icon className="w-6 h-6 text-blue-600" />
-                  </motion.div>
-
-                  {/* Stat Box */}
-                  <motion.div
-                    animate={{
-                      scale: isHovered ? 1.05 : 1,
-                    }}
-                    className="text-right"
-                  >
-                    <p className="text-2xl font-poppins font-bold text-blue-600">
-                      {advantage.stat}
-                    </p>
-                    <p className="text-xs text-gray-600 font-medium">
-                      {advantage.statLabel}
-                    </p>
-                  </motion.div>
+        <div className="grid gap-5 sm:grid-cols-2">
+          {ADVANTAGES.map(({ icon: Icon, title, description, stat, label }) => (
+            <article key={title} className="landing-card landing-card-interactive p-6">
+              <div className="flex items-start justify-between gap-4">
+                <div className="landing-icon-wrap">
+                  <Icon size={19} />
                 </div>
-
-                {/* Title */}
-                <h3 className="text-xl font-poppins font-bold text-gray-900 mb-2">
-                  {advantage.title}
-                </h3>
-
-                {/* Description */}
-                <p className="text-gray-600 leading-relaxed">
-                  {advantage.description}
-                </p>
-
-                {/* Hover Line */}
-                <motion.div
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: isHovered ? 1 : 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="mt-4 h-1 w-full bg-gradient-to-r from-blue-600 to-purple-600 origin-left"
-                />
+                <div className="text-right">
+                  <p className="text-2xl font-poppins font-semibold tracking-tight text-slate-950">{stat}</p>
+                  <p className="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">{label}</p>
+                </div>
               </div>
-            </motion.div>
-          );
-        })}
-      </motion.div>
-
-      {/* Trust Indicators */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.3 }}
-        viewport={{ once: true }}
-        className="mt-16 p-8 rounded-2xl bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200"
-      >
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-          {[
-            { number: '50K+', label: 'Active Users' },
-            { number: '2K+', label: 'Monthly Placements' },
-            { number: '4.9★', label: 'User Rating' },
-            { number: '24/7', label: 'Support' },
-          ].map((item, index) => (
-            <motion.div
-              key={index}
-              whileHover={{ y: -5 }}
-              className="text-center"
-            >
-              <p className="text-2xl font-poppins font-bold text-blue-600 mb-1">
-                {item.number}
-              </p>
-              <p className="text-sm text-gray-600">{item.label}</p>
-            </motion.div>
+              <h3 className="mt-5 text-lg font-poppins font-semibold tracking-tight text-slate-950">{title}</h3>
+              <p className="mt-3 text-sm leading-7 text-slate-600">{description}</p>
+            </article>
           ))}
         </div>
-      </motion.div>
+      </div>
+
+      <div className="landing-trust-strip">
+        {TRUST_POINTS.map((item) => (
+          <div key={item.label} className="text-center">
+            <p className="text-2xl font-poppins font-semibold tracking-tight text-slate-950">{item.value}</p>
+            <p className="mt-1 text-sm text-slate-600">{item.label}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

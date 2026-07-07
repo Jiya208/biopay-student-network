@@ -1,168 +1,164 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FiMenu, FiX } from 'react-icons/fi';
-import Button from '../common/Button';
-import logo from '../../assets/logo.png';
+import { FiMenu, FiMoon, FiSun, FiX } from 'react-icons/fi';
+import { useApp } from '../../context/AppContext';
+import logo from '../../assets/logo-ui.png';
+
+const NAV_LINKS = [
+  { label: 'Features', href: '#features' },
+  { label: 'How It Works', href: '#how-it-works' },
+  { label: 'Benefits', href: '#why-us' },
+  { label: 'Testimonials', href: '#testimonials' },
+  { label: 'FAQs', href: '#faq' },
+];
 
 const LandingNavbar = ({ isScrolled }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
-
-  const navLinks = [
-    { label: 'Features', href: '#features' },
-    { label: 'How It Works', href: '#how-it-works' },
-    { label: 'Why Us', href: '#why-us' },
-    { label: 'Testimonials', href: '#testimonials' },
-    { label: 'FAQ', href: '#faq' },
-  ];
-
-  const handleGetStarted = () => {
-    navigate('/login');
-  };
+  const { settings, updateSettings } = useApp();
+  const isDarkMode = settings?.darkMode ?? true;
 
   const handleSmoothScroll = (href) => {
     setMobileMenuOpen(false);
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+
+    if (href === '#hero') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
     }
+
+    document.querySelector(href)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  const toggleTheme = () => updateSettings('darkMode', !isDarkMode);
+
   return (
-    <motion.header
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? 'bg-white/95 backdrop-blur-xl shadow-xl border-b border-gray-200'
-          : 'bg-gradient-to-br from-blue-950/40 via-blue-900/30 to-slate-900/20 backdrop-blur-xl border-b border-blue-400/20 hover:border-blue-400/30'
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-        {/* Logo */}
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          className="flex items-center gap-3 cursor-pointer"
-          onClick={() => handleSmoothScroll('#hero')}
-        >
-          <img
-            src={logo}
-            alt="BSN Logo"
-            className="w-10 h-10 object-contain drop-shadow-[0_2px_8px_rgba(37,99,235,0.3)]"
-          />
-          <div className="hidden sm:block">
-            <p className="font-poppins font-bold text-lg text-gray-900 tracking-tight">BSN</p>
-            <p className="text-xs font-semibold text-blue-600">Student Network</p>
-          </div>
-        </motion.div>
-
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <motion.a
-              key={link.label}
-              href={link.href}
-              onClick={(e) => {
-                e.preventDefault();
-                handleSmoothScroll(link.href);
-              }}
-              whileHover={{ color: '#2563EB' }}
-              className="text-gray-600 font-medium text-sm hover:text-blue-600 transition-colors cursor-pointer"
+    <header className="landing-navbar" data-scrolled={isScrolled}>
+      <div className="landing-container">
+        <div className={`landing-navbar-shell ${isScrolled ? 'is-scrolled' : ''} ${mobileMenuOpen ? 'is-open' : ''}`}>
+          <div className="flex items-center justify-between gap-4 px-4 py-3 sm:px-5">
+            <button
+              type="button"
+              onClick={() => handleSmoothScroll('#hero')}
+              className="group flex items-center gap-3 text-left"
+              aria-label="Go to top"
             >
-              {link.label}
-            </motion.a>
-          ))}
-        </nav>
+              <img
+                src={logo}
+                alt="BSN logo"
+                className="h-11 w-11 rounded-2xl object-cover shadow-[0_12px_28px_rgba(15,23,42,0.18)] transition-transform duration-300 group-hover:scale-[1.03]"
+                width="44"
+                height="44"
+                decoding="async"
+              />
+              <div className="landing-brand-copy hidden min-[420px]:block">
+                <p className="landing-brand-title">BioPay Student Network</p>
+                <p className="landing-brand-subtitle">Student identity, mentoring and opportunities</p>
+              </div>
+            </button>
 
-        {/* Right Side - Desktop */}
-        <div className="hidden md:flex items-center gap-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => navigate('/login')}
-          >
-            Sign In
-          </Button>
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={handleGetStarted}
-            className="bg-blue-600 hover:bg-blue-700"
-          >
-            Get Started
-          </Button>
-        </div>
-
-        {/* Mobile Menu Button */}
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
-          aria-label="Toggle menu"
-        >
-          {mobileMenuOpen ? (
-            <FiX size={24} className="text-gray-900" />
-          ) : (
-            <FiMenu size={24} className="text-gray-900" />
-          )}
-        </button>
-      </div>
-
-      {/* Mobile Navigation */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.nav
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            className="md:hidden bg-white border-t border-gray-100 overflow-hidden"
-          >
-            <div className="px-4 py-4 space-y-3">
-              {navLinks.map((link) => (
-                <motion.a
+            <nav className="hidden items-center gap-7 xl:flex" aria-label="Primary navigation">
+              {NAV_LINKS.map((link) => (
+                <a
                   key={link.label}
                   href={link.href}
-                  onClick={(e) => {
-                    e.preventDefault();
+                  onClick={(event) => {
+                    event.preventDefault();
                     handleSmoothScroll(link.href);
                   }}
-                  className="block px-4 py-2 text-gray-600 font-medium hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  className="landing-nav-link"
                 >
                   {link.label}
-                </motion.a>
+                </a>
               ))}
-              <div className="flex flex-col gap-3 pt-4 border-t border-gray-100">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    navigate('/login');
-                  }}
-                  fullWidth
-                >
-                  Sign In
-                </Button>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    handleGetStarted();
-                  }}
-                  fullWidth
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  Get Started
-                </Button>
+            </nav>
+
+            <div className="hidden items-center gap-3 xl:flex">
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className="landing-theme-toggle"
+                title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+                aria-label="Toggle dark mode"
+              >
+                {isDarkMode ? <FiSun size={18} /> : <FiMoon size={18} />}
+              </button>
+              <Link to="/login" className="landing-button landing-button-secondary">
+                Log in
+              </Link>
+              <Link to="/signup" className="landing-button landing-button-primary">
+                Get Started
+              </Link>
+            </div>
+
+            <div className="flex items-center gap-2 xl:hidden">
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className="landing-theme-toggle"
+                title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+                aria-label="Toggle dark mode"
+              >
+                {isDarkMode ? <FiSun size={18} /> : <FiMoon size={18} />}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen((prev) => !prev)}
+                className="landing-theme-toggle"
+                aria-expanded={mobileMenuOpen}
+                aria-controls="landing-mobile-nav"
+                aria-label="Toggle navigation menu"
+              >
+                {mobileMenuOpen ? <FiX size={20} /> : <FiMenu size={20} />}
+              </button>
+            </div>
+          </div>
+
+          {mobileMenuOpen && (
+            <div id="landing-mobile-nav" className="landing-mobile-panel xl:hidden">
+              <div className="grid gap-2 px-4 pb-4 pt-1 sm:px-5">
+                {NAV_LINKS.map((link) => (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      handleSmoothScroll(link.href);
+                    }}
+                    className="landing-mobile-link"
+                  >
+                    {link.label}
+                  </a>
+                ))}
+
+                <div className="grid gap-3 pt-2 sm:grid-cols-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      navigate('/login');
+                    }}
+                    className="landing-button landing-button-secondary"
+                  >
+                    Log in
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      navigate('/signup');
+                    }}
+                    className="landing-button landing-button-primary"
+                  >
+                    Get Started
+                  </button>
+                </div>
               </div>
             </div>
-          </motion.nav>
-        )}
-      </AnimatePresence>
-    </motion.header>
+          )}
+        </div>
+      </div>
+    </header>
   );
 };
 
